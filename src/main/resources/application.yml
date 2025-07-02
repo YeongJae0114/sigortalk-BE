@@ -1,1 +1,3 @@
-spring.application.name=backend
+spring:
+  profiles:
+    active: dev  # 로컬 개발 시는 'dev', 배포 서버에서는 'prod'로 변경
