@@ -80,6 +80,8 @@ jobs:
               -e DB_DIALECT="${{ secrets.DB_DIALECT }}" \
               -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
               -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+              -e DB_NAME="${{ secrets.DB_NAME }}" \
+              -e DB_ROOT_PASSWORD="${{ secrets.DB_ROOT_PASSWORD }}" \
               $IMAGE_NAME:$TAG
 
             echo "✅ Deployment to EC2 (main) completed!"
