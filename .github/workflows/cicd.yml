@@ -59,21 +59,24 @@ jobs:
             IMAGE="zerojae175/sigorotalk:$TAG"
             APP_DIR="/home/${{ secrets.SSH_USERNAME }}/sigorotalk"
 
-            echo "Pulling Docker image..."
+            echo "📥 Pulling Docker image..."
             docker pull $IMAGE
 
-            echo "Updating .env file..."
-            cat <<EOF > $APP_DIR/.env
-                IMAGE=$IMAGE
-                DB_URL=${{ secrets.DB_URL }}
-                DB_USERNAME=${{ secrets.DB_USERNAME }}
-                DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-                SERVER_PORT=${{ secrets.SERVER_PORT }}  
-                
-                EOF
-            echo "Deploying with Docker Compose..."
+            echo "📂 Creating application directory if not exists..."
+            mkdir -p $APP_DIR
+
+            echo "📄 Generating .env file..."
+            echo "IMAGE=$IMAGE" > $APP_DIR/.env
+            echo "DB_URL=${{ secrets.DB_URL }}" >> $APP_DIR/.env
+            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> $APP_DIR/.env
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $APP_DIR/.env
+            echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> $APP_DIR/.env
+
+            echo "✅ .env file created at $APP_DIR/.env"
+
+            echo "🚀 Deploying with Docker Compose..."
             cd $APP_DIR
-            docker compose down
+            docker compose down || true
             docker compose up -d --remove-orphans
 
-            echo "🚀 sigorotalk 프로젝트 배포 완료!"
+            echo "🎉 sigorotalk 프로젝트 배포 완료!"
