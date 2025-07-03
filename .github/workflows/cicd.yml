@@ -69,7 +69,7 @@ jobs:
                 DB_USERNAME=${{ secrets.DB_USERNAME }}
                 DB_PASSWORD=${{ secrets.DB_PASSWORD }}
                 SERVER_PORT=${{ secrets.SERVER_PORT }}  
-                # 추가 환경변수 필요 시 여기에 작성
+                
                 EOF
             echo "Deploying with Docker Compose..."
             cd $APP_DIR
