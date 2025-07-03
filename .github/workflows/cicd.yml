@@ -48,7 +48,7 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > /tmp/ssh_key.pem
           chmod 600 /tmp/ssh_key.pem
 
-      - name: Deploy using Docker Compose
+      - name: Deploy Spring Boot container
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -57,26 +57,23 @@ jobs:
           script: |
             TAG="main_${{ github.sha }}"
             IMAGE="zerojae175/sigorotalk:$TAG"
-            APP_DIR="/home/${{ secrets.SSH_USERNAME }}/sigorotalk"
 
             echo "📥 Pulling Docker image..."
             docker pull $IMAGE
 
-            echo "📂 Creating application directory if not exists..."
-            mkdir -p $APP_DIR
+            echo "🛑 Stopping existing Spring Boot container..."
+            docker stop sigorotalk-app || true
+            docker rm sigorotalk-app || true
 
-            echo "📄 Generating .env file..."
-            echo "IMAGE=$IMAGE" > $APP_DIR/.env
-            echo "DB_URL=${{ secrets.DB_URL }}" >> $APP_DIR/.env
-            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> $APP_DIR/.env
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $APP_DIR/.env
-            echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> $APP_DIR/.env
+            echo "🚀 Running new Spring Boot container..."
+            docker run -d \
+              --name sigorotalk-app \
+              --network bridge \ # Docker 기본 네트워크 사용
+              -e SPRING_PROFILES_ACTIVE=production \
+              -e DB_URL=${{ secrets.DB_URL }} \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -p 8080:8080 \
+              $IMAGE
 
-            echo "✅ .env file created at $APP_DIR/.env"
-
-            echo "🚀 Deploying with Docker Compose..."
-            cd $APP_DIR
-            docker compose down || true
-            docker compose up -d --remove-orphans
-
-            echo "🎉 sigorotalk 프로젝트 배포 완료!"
+            echo "🎉 sigorotalk Spring Boot 배포 완료!"
