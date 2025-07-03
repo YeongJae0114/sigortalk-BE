@@ -13,7 +13,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (필요 시 활성화 가능)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/home", "/public/**").permitAll() // 공개 URL
+                        .requestMatchers("/", "/home", "/public/**", "/actuator/prometheus").permitAll() // 공개 URL
                         .anyRequest().authenticated() // 그 외 인증 필요
                 )
                 .formLogin(Customizer.withDefaults()) // 기본 로그인 폼 사용
