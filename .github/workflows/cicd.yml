@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04 # ✅ 서버 버전에 맞춤
+    runs-on: ubuntu-24.04
     env:
       IMAGE_NAME: zerojae175/sigorotalk
       IMAGE_TAG: ${{ github.sha }}
@@ -28,7 +28,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image (production)
+      - name: Build and push production image
         run: |
           echo "📦 Building production image..."
           docker buildx build \
@@ -41,12 +41,18 @@ jobs:
             --push .
 
   deploy:
-    runs-on: ubuntu-24.04 # ✅ 서버 버전에 맞춤
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
     needs: build
     env:
       IMAGE_NAME: zerojae175/sigorotalk
     steps:
-      - name: Deploy via SSH
+      - name: Save SSH Key
+        run: |
+          echo "${{ secrets.SSH_KEY }}" > /tmp/ssh_key.pem
+          chmod 600 /tmp/ssh_key.pem
+
+      - name: Deploy to EC2 (main)
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -56,39 +62,25 @@ jobs:
             set -e
 
             TAG="latest"
-            CONTAINER_NAME="sigorotalk-app"
-            PORT="${{ secrets.SERVER_PORT }}"
-            DB_URL="${{ secrets.DB_URL }}"
-
-            echo "🔎 Checking deployment variables..."
-            echo "IMAGE_NAME: $IMAGE_NAME"
-            echo "TAG: $TAG"
-            echo "CONTAINER_NAME: $CONTAINER_NAME"
-            echo "PORT: $PORT"
-            echo "DB_URL: $DB_URL"
-
             echo "📥 Pulling Docker image: $IMAGE_NAME:$TAG"
             docker pull $IMAGE_NAME:$TAG
 
-            echo "🧹 Removing dangling images (if any)..."
-            docker image prune -f || true
+            echo "🛑 Stopping and removing old container: sigorotalk"
+            docker stop sigorotalk || true
+            docker rm sigorotalk || true
 
-            echo "🛑 Stopping and removing existing container: $CONTAINER_NAME (if exists)"
-            docker stop $CONTAINER_NAME || true
-            docker rm $CONTAINER_NAME || true
-
-            echo "🚀 Running new container: $CONTAINER_NAME"
+            echo "🚀 Running new container: sigorotalk"
             docker run -d --restart unless-stopped \
-              --name $CONTAINER_NAME \
-              -p ${PORT}:${PORT} \
+              --name sigorotalk \
+              -p 8080:8080 \
               --add-host=host.docker.internal:host-gateway \
               -e SPRING_PROFILES_ACTIVE=production \
-              -e SERVER_PORT=$PORT \
-              -e DB_URL=$DB_URL \
+              -e SERVER_PORT="8080" \
+              -e DB_URL="${{ secrets.DB_URL }}" \
               -e DB_DRIVER="${{ secrets.DB_DRIVER }}" \
               -e DB_DIALECT="${{ secrets.DB_DIALECT }}" \
               -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
               -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
               $IMAGE_NAME:$TAG
 
-            echo "✅ Deployment complete!"
+            echo "✅ Deployment to EC2 (main) completed!"
