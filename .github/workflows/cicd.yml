@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Save SSH Key
         run: |
-          echo "${{ secrets.SSH_KEY }}" > /tmp/ssh_key.pem
+          printf '%s\n' "${{ secrets.SSH_KEY }}" > /tmp/ssh_key.pem
           chmod 600 /tmp/ssh_key.pem
 
       - name: Deploy to EC2 (main)
