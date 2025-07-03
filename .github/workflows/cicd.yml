@@ -53,26 +53,37 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            set -e
+
             TAG="latest"
             CONTAINER_NAME="sigorotalk-app"
-            HOST_PORT="${{ secrets.HOST_PORT }}"          # ✅ 호스트 포트
-            SERVER_PORT="${{ secrets.SERVER_PORT }}"      # ✅ 컨테이너(Spring Boot) 내부 포트
+            PORT="${{ secrets.SERVER_PORT }}"
             DB_URL="${{ secrets.DB_URL }}"
+
+            echo "🔎 Checking deployment variables..."
+            echo "IMAGE_NAME: $IMAGE_NAME"
+            echo "TAG: $TAG"
+            echo "CONTAINER_NAME: $CONTAINER_NAME"
+            echo "PORT: $PORT"
+            echo "DB_URL: $DB_URL"
 
             echo "📥 Pulling Docker image: $IMAGE_NAME:$TAG"
             docker pull $IMAGE_NAME:$TAG
 
-            echo "🛑 Stopping and removing existing container: $CONTAINER_NAME"
+            echo "🧹 Removing dangling images (if any)..."
+            docker image prune -f || true
+
+            echo "🛑 Stopping and removing existing container: $CONTAINER_NAME (if exists)"
             docker stop $CONTAINER_NAME || true
             docker rm $CONTAINER_NAME || true
 
             echo "🚀 Running new container: $CONTAINER_NAME"
             docker run -d --restart unless-stopped \
               --name $CONTAINER_NAME \
-              -p ${HOST_PORT}:${SERVER_PORT} \            # ✅ 외부:내부 포트 분리
+              -p ${PORT}:${PORT} \
               --add-host=host.docker.internal:host-gateway \
               -e SPRING_PROFILES_ACTIVE=production \
-              -e SERVER_PORT=$SERVER_PORT \
+              -e SERVER_PORT=$PORT \
               -e DB_URL=$DB_URL \
               -e DB_DRIVER="${{ secrets.DB_DRIVER }}" \
               -e DB_DIALECT="${{ secrets.DB_DIALECT }}" \
