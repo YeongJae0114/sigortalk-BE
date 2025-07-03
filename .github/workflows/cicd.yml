@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04 # ✅ 서버 버전에 맞춤
     env:
       IMAGE_NAME: zerojae175/sigorotalk
       IMAGE_TAG: ${{ github.sha }}
@@ -28,52 +28,56 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (production)
         run: |
+          echo "📦 Building production image..."
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --cache-from=type=registry,ref=${IMAGE_NAME}:cache \
             --cache-to=type=registry,ref=${IMAGE_NAME}:cache,mode=max \
             -f Dockerfile \
             -t ${IMAGE_NAME}:main_${IMAGE_TAG} \
+            -t ${IMAGE_NAME}:latest \
             --push .
 
   deploy:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04 # ✅ 서버 버전에 맞춤
     needs: build
+    env:
+      IMAGE_NAME: zerojae175/sigorotalk
     steps:
-      - name: Save SSH Key
-        run: |
-          echo "${{ secrets.SSH_KEY }}" > /tmp/ssh_key.pem
-          chmod 600 /tmp/ssh_key.pem
-
-      - name: Deploy Spring Boot container
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            TAG="main_${{ github.sha }}"
-            IMAGE="zerojae175/sigorotalk:$TAG"
+            TAG="latest"
+            CONTAINER_NAME="sigorotalk-app"
+            HOST_PORT="${{ secrets.HOST_PORT }}"          # ✅ 호스트 포트
+            SERVER_PORT="${{ secrets.SERVER_PORT }}"      # ✅ 컨테이너(Spring Boot) 내부 포트
+            DB_URL="${{ secrets.DB_URL }}"
 
-            echo "📥 Pulling Docker image..."
-            docker pull $IMAGE
+            echo "📥 Pulling Docker image: $IMAGE_NAME:$TAG"
+            docker pull $IMAGE_NAME:$TAG
 
-            echo "🛑 Stopping existing Spring Boot container..."
-            docker stop sigorotalk-app || true
-            docker rm sigorotalk-app || true
+            echo "🛑 Stopping and removing existing container: $CONTAINER_NAME"
+            docker stop $CONTAINER_NAME || true
+            docker rm $CONTAINER_NAME || true
 
-            echo "🚀 Running new Spring Boot container..."
-            docker run -d \
-              --name sigorotalk-app \
-              --network bridge \ # Docker 기본 네트워크 사용
+            echo "🚀 Running new container: $CONTAINER_NAME"
+            docker run -d --restart unless-stopped \
+              --name $CONTAINER_NAME \
+              -p ${HOST_PORT}:${SERVER_PORT} \            # ✅ 외부:내부 포트 분리
+              --add-host=host.docker.internal:host-gateway \
               -e SPRING_PROFILES_ACTIVE=production \
-              -e DB_URL=${{ secrets.DB_URL }} \
-              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -p 8080:8080 \
-              $IMAGE
+              -e SERVER_PORT=$SERVER_PORT \
+              -e DB_URL=$DB_URL \
+              -e DB_DRIVER="${{ secrets.DB_DRIVER }}" \
+              -e DB_DIALECT="${{ secrets.DB_DIALECT }}" \
+              -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+              -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+              $IMAGE_NAME:$TAG
 
-            echo "🎉 sigorotalk Spring Boot 배포 완료!"
+            echo "✅ Deployment complete!"
