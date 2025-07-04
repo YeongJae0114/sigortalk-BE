@@ -30,6 +30,9 @@ public class Mentor extends BaseTimeEntity {
     @Lob
     private String detailedDescription;
 
+    @Lob
+    private String career;
+
     @Column(length = 100)
     private String expertise;
 
