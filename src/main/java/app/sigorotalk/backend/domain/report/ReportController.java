@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/reports")
 public class ReportController {
 
-    // TODO: [POST /] 리포트 생성 요청 API (대화록 파일 업로드)
+    // TODO: [POST /] 리포트 생성 요청 API (Body에 chatId와 파일 포함)
+    // public ResponseEntity<?> createReport( ... )
 
-    // TODO: [GET /{applicationId}] 특정 커피챗의 리포트 조회 API
-
+    // TODO: [GET /by-chat/{chatId}] 특정 커피챗 ID로 리포트 조회 API
+    // public ResponseEntity<?> getReportByChatId( ... )
 }
