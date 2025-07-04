@@ -20,6 +20,7 @@ public class ApiResponse<T> {
     }
 
     // 삭제 응답의 경우 ApiResponse.success() 에서 , response = null 일 경우 추가
-    public static ApiResponse<Void> success() {return new ApiResponse<>(true, null, null);
+    public static ApiResponse<Void> success() {
+        return new ApiResponse<>(true, null, null);
     }
 }
