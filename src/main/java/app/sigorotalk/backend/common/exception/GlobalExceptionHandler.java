@@ -1,8 +1,5 @@
 package app.sigorotalk.backend.common.exception;
 
-import static app.sigorotalk.backend.common.exception.CommonErrorCode.BAD_REQUEST;
-import static app.sigorotalk.backend.common.exception.CommonErrorCode.SYSTEM_ERROR;
-
 import app.sigorotalk.backend.common.response.ApiResponse;
 import app.sigorotalk.backend.common.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +10,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static app.sigorotalk.backend.common.exception.CommonErrorCode.*;
 
 @Slf4j
 @RestControllerAdvice
@@ -56,16 +58,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleValidationException(MethodArgumentNotValidException e) {
         log.warn("Method Argument Not Valid Exception 발생: {}", e.getMessage());
 
-        String errorMessage = e.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(fieldError -> fieldError.getDefaultMessage())
-                .findFirst()
-                .orElse("잘못된 요청입니다.");
+        Map<String, String> errors = new HashMap<>();
+        e.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                INVALID_PARAMETER.getCode(),
+                INVALID_PARAMETER.getMessage(),
+                errors
+        );
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.fail(new ErrorResponse(400, errorMessage)));
+                .body(ApiResponse.fail(errorResponse));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
