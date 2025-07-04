@@ -1,6 +1,7 @@
 package app.sigorotalk.backend.common.response;
 
 import lombok.Getter;
+
 import java.util.Map;
 
 @Getter
