@@ -85,4 +85,4 @@ jobs:
               -e DB_ROOT_PASSWORD="${{ secrets.DB_ROOT_PASSWORD }}" \
               $IMAGE_NAME:$TAG
 
-            echo "✅ Deployment to EC2 (main) completed!"
+            echo "✅ Deployment to oce (main) completed!"
