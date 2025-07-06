@@ -2,12 +2,9 @@ package app.sigorotalk.backend.domain.auth;
 
 
 import app.sigorotalk.backend.common.response.ApiResponse;
-import app.sigorotalk.backend.config.jwt.JwtAuthenticationFilter;
 import app.sigorotalk.backend.domain.auth.dto.LoginRequestDto;
-import app.sigorotalk.backend.domain.auth.dto.TokenDto;
+import app.sigorotalk.backend.domain.auth.dto.LoginResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,16 +19,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<TokenDto>> login(@RequestBody LoginRequestDto loginRequestDto) {
-        String accessToken = authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
-        // 헤더에도 토큰 추가
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(JwtAuthenticationFilter.AUTHORIZATION_HEADER, "Bearer " + accessToken);
+    public ResponseEntity<ApiResponse<LoginResponseDto>> login(@RequestBody LoginRequestDto loginRequestDto) {
+        LoginResponseDto loginResponse = authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
 
-        return new ResponseEntity<>(
-                ApiResponse.success(new TokenDto(accessToken)),
-                httpHeaders,
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok(ApiResponse.success(loginResponse));
     }
 }

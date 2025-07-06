@@ -1,18 +1,29 @@
 package app.sigorotalk.backend.domain.user;
 
 
+import app.sigorotalk.backend.common.response.ApiResponse;
+import app.sigorotalk.backend.domain.user.dto.SignUpRequestDto;
+import app.sigorotalk.backend.domain.user.dto.UserResponseDto;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    // TODO: [POST /] 회원가입 API (URL 경로가 클래스 레벨로 통합되었으므로 /signup 제거)
-    // public ResponseEntity<?> signup( ... )
+    private final UserService userService;
 
+    @PostMapping
+    public ResponseEntity<ApiResponse<UserResponseDto>> signup(@Valid @RequestBody SignUpRequestDto requestDto) {
+        UserResponseDto responseDto = userService.signup(requestDto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED) // 201 Created
+                .body(ApiResponse.success(responseDto));
+    }
 
     // --- 테스트용 엔드포인트 추가 ---
     @GetMapping("/me")
