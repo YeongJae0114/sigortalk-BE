@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -19,6 +20,22 @@ import static app.sigorotalk.backend.common.exception.CommonErrorCode.*;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+
+    /**
+     * 인증 실패 예외 처리 (BadCredentialsException 등)
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthenticationException(AuthenticationException e) {
+        log.warn("인증 실패: {}", e.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                CommonErrorCode.UNAUTHORIZED.getCode(),
+                "이메일 또는 비밀번호가 일치하지 않습니다." // 사용자에게 보여줄 메시지
+        );
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED) // 401 상태 코드
+                .body(ApiResponse.fail(errorResponse));
+    }
 
     /**
      * 비즈니스 예외 처리

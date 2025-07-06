@@ -3,6 +3,7 @@ package app.sigorotalk.backend.domain.user;
 import app.sigorotalk.backend.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +30,15 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Role role;
+
+    @Builder
+    public User(Long id, String email, String password, String name, Role role) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.role = role;
+    }
 
     public enum Role {
         ROLE_USER, ROLE_MENTOR
