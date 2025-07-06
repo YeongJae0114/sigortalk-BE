@@ -16,7 +16,7 @@ public class BackendApplication {
 		app.setBannerMode(Banner.Mode.OFF); // 실행 시, 처음에 뜨는 배너 출력 끄기
 		app.run(args);
 
-		log.info("BackendApplication started successfully.");
+		log.info("🚀BackendApplication started successfully.🚀");
 	}
 
 }

@@ -33,6 +33,12 @@ management:
     prometheus:
       enabled: true
 
+  observations:
+    http:
+      server:
+        requests:
+          record-exceptions: true  # ✅ 예외도 메트릭으로 기록
+
 logging:
   level:
     root: INFO
