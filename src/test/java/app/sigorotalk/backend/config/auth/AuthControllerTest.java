@@ -1,4 +1,4 @@
-package app.sigorotalk.backend.config.jwt;
+package app.sigorotalk.backend.config.auth;
 
 
 import app.sigorotalk.backend.domain.auth.dto.LoginRequestDto;
@@ -6,6 +6,7 @@ import app.sigorotalk.backend.domain.user.User;
 import app.sigorotalk.backend.domain.user.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,11 +20,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -70,6 +71,9 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.response.user.name").value("Test User"))
                 .andExpect(jsonPath("$.response.user.email").value(testEmail))
                 .andExpect(jsonPath("$.response.user.role").value("ROLE_USER"))
+                .andExpect(cookie().exists("refresh_token"))
+                .andExpect(cookie().httpOnly("refresh_token", true))
+                .andExpect(cookie().path("refresh_token", "/"))
                 .andDo(print());
     }
 
@@ -119,6 +123,37 @@ class AuthControllerTest {
         // when & then
         mockMvc.perform(get("/api/v1/users/me"))
                 .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("API 재발급 성공: 유효한 Refresh Token 쿠키로 /refresh 요청 시 새 Access Token과 200 OK를 반환한다.")
+    void refreshApi_Success() throws Exception {
+        // given: 먼저 로그인을 통해 유효한 토큰들을 얻어옴
+        LoginRequestDto loginDto = createLoginRequestDto(testEmail, testPassword);
+        MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDto)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // 1. 응답에서 JSON 대신 'refresh_token' 쿠키를 추출합니다.
+        Cookie refreshTokenCookie = loginResult.getResponse().getCookie("refresh_token");
+
+        // 쿠키가 정상적으로 생성되었는지 확인
+        assertNotNull(refreshTokenCookie, "Refresh token cookie should not be null");
+
+        // 2. RefreshRequestDto는 더 이상 필요 없으므로 관련 코드를 삭제합니다.
+
+        // when & then: 얻어온 Refresh Token 쿠키로 재발급 API에 접근
+        mockMvc.perform(post("/api/v1/auth/refresh")
+                                // 3. .cookie()를 사용해 요청에 쿠키를 담아 보냅니다.
+                                .cookie(refreshTokenCookie)
+                        // 4. contentType과 content는 요청 body가 없으므로 삭제합니다.
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.response.accessToken").exists())
                 .andDo(print());
     }
 
