@@ -18,6 +18,7 @@ import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -28,13 +29,16 @@ public class JwtTokenProvider {
     private static final String AUTHORITIES_KEY = "auth";
     private final Key key;
     private final long accessTokenValidityInMilliseconds;
+    private final long refreshTokenValidityInMilliseconds;
 
     public JwtTokenProvider(
             @Value("${jwt.secret}") String secretKey,
-            @Value("${jwt.access-token-validity-in-seconds}") long accessTokenValidityInSeconds) {
+            @Value("${jwt.access-token-validity-in-seconds}") long accessTokenValidityInSeconds,
+            @Value("${jwt.refresh-token-validity-in-seconds}") long refreshTokenValidityInMilliseconds) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenValidityInMilliseconds = accessTokenValidityInSeconds * 1000;
+        this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds * 1000;
     }
 
     // Authentication 객체를 받아 Access Token 생성
@@ -65,10 +69,12 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
+        Object authoritiesClaim = claims.get(AUTHORITIES_KEY);
+        Collection<? extends GrantedAuthority> authorities = (authoritiesClaim == null)
+                ? Collections.emptyList()
+                : Arrays.stream(authoritiesClaim.toString().split(","))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
 
         UserDetails principal = new User(claims.getSubject(), "", authorities);
 
@@ -90,5 +96,17 @@ public class JwtTokenProvider {
             log.info("JWT 토큰이 잘못되었습니다.");
         }
         return false;
+    }
+
+    // Refresh Token 생성 메서드
+    public String createRefreshToken(Authentication authentication) {
+        long now = (new Date()).getTime();
+        Date validity = new Date(now + this.refreshTokenValidityInMilliseconds);
+
+        return Jwts.builder()
+                .subject(authentication.getName())
+                .expiration(validity)
+                .signWith(key)
+                .compact();
     }
 }

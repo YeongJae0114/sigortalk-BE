@@ -2,6 +2,7 @@ package app.sigorotalk.backend.config.jwt;
 
 
 import app.sigorotalk.backend.domain.auth.dto.LoginRequestDto;
+import app.sigorotalk.backend.domain.auth.dto.RefreshRequestDto;
 import app.sigorotalk.backend.domain.user.User;
 import app.sigorotalk.backend.domain.user.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -119,6 +120,33 @@ class AuthControllerTest {
         // when & then
         mockMvc.perform(get("/api/v1/users/me"))
                 .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("API 재발급 성공: 유효한 Refresh Token으로 /refresh 요청 시 새 Access Token과 200 OK를 반환한다.")
+    void refreshApi_Success() throws Exception {
+        // given: 먼저 로그인을 통해 유효한 토큰들을 얻어옴
+        LoginRequestDto loginDto = createLoginRequestDto(testEmail, testPassword);
+        MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDto)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // 응답에서 Refresh Token 추출
+        JsonNode responseJson = objectMapper.readTree(loginResult.getResponse().getContentAsString());
+        String refreshToken = responseJson.at("/response/refreshToken").asText();
+
+        RefreshRequestDto refreshDto = new RefreshRequestDto(refreshToken);
+
+        // when & then: 얻어온 Refresh Token으로 재발급 API에 접근
+        mockMvc.perform(post("/api/v1/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(refreshDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.response.accessToken").exists())
                 .andDo(print());
     }
 

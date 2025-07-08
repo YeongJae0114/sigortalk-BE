@@ -2,15 +2,14 @@ package app.sigorotalk.backend.domain.user;
 
 import app.sigorotalk.backend.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Entity
 @Table(name = "tb_user")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
     @Id
@@ -31,13 +30,11 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, length = 20)
     private Role role;
 
-    @Builder
-    public User(Long id, String email, String password, String name, Role role) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.role = role;
+    @Column(length = 500) // JWT 길이를 고려하여 충분한 길이 설정
+    private String refreshToken;
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public enum Role {

@@ -15,16 +15,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class JwtTokenProviderTest {
 
-    // 테스트용 설정값
     private final String testSecret = "V2VMa2VTaWdvcm90YWxrQW5kSXRzQmVzdG9mQmVzdFNlY3JldEtleUZvclByb2plY3Q=";
-    // 테스트 대상 클래스
+    long accessTokenValidityInSeconds = 3600;   // 1시간
+    long refreshTokenValidityInSeconds = 604800; // 7일
     private JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
     void setUp() {
         // 각 테스트가 실행되기 전에 JwtTokenProvider 인스턴스를 새로 생성
-        long accessTokenValidityInSeconds = 3600;   // 1시간
-        jwtTokenProvider = new JwtTokenProvider(testSecret, accessTokenValidityInSeconds);
+        jwtTokenProvider = new JwtTokenProvider(testSecret, accessTokenValidityInSeconds, refreshTokenValidityInSeconds);
     }
 
     @Test
@@ -68,18 +67,16 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("토큰 유효성 검증 실패: 만료된 토큰은 false를 반환한다.")
     void validateToken_Failure_Expired() {
-        // given: 테스트 준비
-        // 만료 시간을 아주 짧게 설정한 토큰 프로바이더를 새로 생성
-        JwtTokenProvider expiredTokenProvider = new JwtTokenProvider(testSecret, 0); // 유효시간 0초
+        // given
+        JwtTokenProvider expiredTokenProvider = new JwtTokenProvider(testSecret, 0, 0); // 유효시간 0초
         Authentication authentication = createTestAuthentication("1", "ROLE_USER");
         String expiredToken = expiredTokenProvider.createAccessToken(authentication);
 
-        // when: 테스트 실행
-        // 만료된 토큰 검증
+        // when
         boolean isValid = jwtTokenProvider.validateToken(expiredToken);
 
-        // then: 결과 검증
-        assertThat(isValid).isFalse(); // 토큰은 유효하지 않아야 함
+        // then
+        assertThat(isValid).isFalse();
     }
 
     @Test
@@ -131,7 +128,7 @@ class JwtTokenProviderTest {
     void validateToken_Failure_WrongSecretKey() {
         // given
         String wrongSecret = "ThisIsTotallyDifferentAndWrongSecretKeyForTestingPurposesWowGreat";
-        JwtTokenProvider wrongProvider = new JwtTokenProvider(wrongSecret, 3600);
+        JwtTokenProvider wrongProvider = new JwtTokenProvider(wrongSecret, 3600, 604800);
         String tokenSignedWithWrongKey = wrongProvider.createAccessToken(createTestAuthentication("1", "ROLE_USER"));
 
         // when
@@ -140,6 +137,7 @@ class JwtTokenProviderTest {
         // then
         assertThat(isValid).isFalse();
     }
+
 
     // 테스트용 Authentication 객체를 쉽게 만들기 위한 헬퍼 메서드
     private Authentication createTestAuthentication(String userId, String role) {

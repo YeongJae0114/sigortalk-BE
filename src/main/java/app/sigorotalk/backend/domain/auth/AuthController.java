@@ -4,6 +4,8 @@ package app.sigorotalk.backend.domain.auth;
 import app.sigorotalk.backend.common.response.ApiResponse;
 import app.sigorotalk.backend.domain.auth.dto.LoginRequestDto;
 import app.sigorotalk.backend.domain.auth.dto.LoginResponseDto;
+import app.sigorotalk.backend.domain.auth.dto.RefreshRequestDto;
+import app.sigorotalk.backend.domain.auth.dto.TokenRefreshResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,5 +25,11 @@ public class AuthController {
         LoginResponseDto loginResponse = authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
 
         return ResponseEntity.ok(ApiResponse.success(loginResponse));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<TokenRefreshResponseDto>> refresh(@RequestBody RefreshRequestDto requestDto) {
+        TokenRefreshResponseDto responseDto = authService.refresh(requestDto.refreshToken());
+        return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 }

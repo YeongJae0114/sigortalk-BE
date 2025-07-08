@@ -9,11 +9,13 @@ import lombok.Getter;
 public class LoginResponseDto {
 
     private final String accessToken;
+    private final String refreshToken;
     private final UserInfo user;
 
-    public static LoginResponseDto of(String accessToken, User userEntity) {
+    public static LoginResponseDto of(String accessToken, String refreshToken, User userEntity) {
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .user(UserInfo.builder()
                         .name(userEntity.getName())
                         .email(userEntity.getEmail())
