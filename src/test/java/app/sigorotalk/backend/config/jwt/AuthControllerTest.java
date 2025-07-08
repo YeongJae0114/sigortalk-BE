@@ -1,0 +1,132 @@
+package app.sigorotalk.backend.config.jwt;
+
+
+import app.sigorotalk.backend.domain.auth.dto.LoginRequestDto;
+import app.sigorotalk.backend.domain.user.User;
+import app.sigorotalk.backend.domain.user.UserRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+class AuthControllerTest {
+
+    private final String testEmail = "testuser@example.com";
+    private final String testPassword = "password123";
+
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @BeforeEach
+    void setUp() {
+        User testUser = User.builder()
+                .email(testEmail)
+                .password(passwordEncoder.encode(testPassword))
+                .name("Test User")
+                .role(User.Role.ROLE_USER)
+                .build();
+        userRepository.save(testUser);
+    }
+
+    @Test
+    @DisplayName("로그인 성공: 올바른 정보로 로그인 시, JWT와 사용자 정보를 포함하여 200 OK를 반환한다.")
+    void login_Success() throws Exception {
+        // given
+        LoginRequestDto loginRequestDto = createLoginRequestDto(testEmail, testPassword); // 헬퍼 메소드 사용
+        String requestBody = objectMapper.writeValueAsString(loginRequestDto);
+
+        // when & then
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.response.accessToken").exists())
+                .andExpect(jsonPath("$.response.user.name").value("Test User"))
+                .andExpect(jsonPath("$.response.user.email").value(testEmail))
+                .andExpect(jsonPath("$.response.user.role").value("ROLE_USER"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("로그인 실패: 잘못된 비밀번호로 로그인 시, 401 Unauthorized를 반환한다.")
+    void login_Failure_WrongPassword() throws Exception {
+        // given
+        LoginRequestDto loginRequestDto = createLoginRequestDto(testEmail, "wrongpassword"); // 헬퍼 메소드 사용
+        String requestBody = objectMapper.writeValueAsString(loginRequestDto);
+
+        // when & then
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("보호된 API 접근 성공: 유효한 JWT로 접근 시, 200 OK를 반환한다.")
+    void protectedEndpoint_Success_WithValidToken() throws Exception {
+        // given: 먼저 로그인을 통해 유효한 토큰을 얻어옴
+        LoginRequestDto loginRequestDto = createLoginRequestDto(testEmail, testPassword); // 헬퍼 메소드 사용
+        String requestBody = objectMapper.writeValueAsString(loginRequestDto);
+
+        MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // 응답 본문(JSON)에서 accessToken 추출
+        String responseBody = loginResult.getResponse().getContentAsString();
+        JsonNode responseJson = objectMapper.readTree(responseBody);
+        String accessToken = responseJson.at("/response/accessToken").asText();
+
+        // when & then: 얻어온 토큰으로 보호된 API에 접근
+        mockMvc.perform(get("/api/v1/users/me")
+                        .header("Authorization", "Bearer " + accessToken)) // Bearer 접두사 추가
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("보호된 API 접근 실패: JWT 없이 접근 시, 401 Unauthorized를 반환한다.")
+    void protectedEndpoint_Failure_NoToken() throws Exception {
+        // when & then
+        mockMvc.perform(get("/api/v1/users/me"))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    // LoginRequestDto 생성을 위한 private 헬퍼 메소드
+    private LoginRequestDto createLoginRequestDto(String email, String password) {
+        LoginRequestDto dto = new LoginRequestDto();
+        ReflectionTestUtils.setField(dto, "email", email);
+        ReflectionTestUtils.setField(dto, "password", password);
+        return dto;
+    }
+}

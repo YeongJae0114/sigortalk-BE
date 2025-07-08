@@ -1,24 +1,55 @@
 package app.sigorotalk.backend.config;
 
+import app.sigorotalk.backend.config.jwt.JwtAuthenticationEntryPoint;
+import app.sigorotalk.backend.config.jwt.JwtAuthenticationFilter;
+import app.sigorotalk.backend.config.jwt.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (필요 시 활성화 가능)
+                // 기본 설정
+                .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                // 세션 STATELESS 설정
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // 예외 처리 설정 추가
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+
+                // 요청 경로별 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/home", "/public/**", "/actuator/prometheus").permitAll() // 공개 URL
-                        .anyRequest().authenticated() // 그 외 인증 필요
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/users").permitAll() // 로그인, 회원가입은 허용
+                        .anyRequest().authenticated() // 나머지는 인증 필요
                 )
-                .formLogin(Customizer.withDefaults()) // 기본 로그인 폼 사용
-                .logout(Customizer.withDefaults());   // 기본 로그아웃 설정
+
+                // JWT 필터 추가
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
