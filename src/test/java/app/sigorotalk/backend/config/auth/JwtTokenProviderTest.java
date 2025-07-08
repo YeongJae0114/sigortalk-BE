@@ -1,5 +1,6 @@
-package app.sigorotalk.backend.config.jwt;
+package app.sigorotalk.backend.config.auth;
 
+import app.sigorotalk.backend.config.jwt.JwtTokenProvider;
 import io.jsonwebtoken.security.SecurityException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

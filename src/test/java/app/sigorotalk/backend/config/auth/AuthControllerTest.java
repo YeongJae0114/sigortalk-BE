@@ -1,4 +1,4 @@
-package app.sigorotalk.backend.config.jwt;
+package app.sigorotalk.backend.config.auth;
 
 
 import app.sigorotalk.backend.domain.auth.dto.LoginRequestDto;

@@ -1,4 +1,4 @@
-package app.sigorotalk.backend.config.jwt;
+package app.sigorotalk.backend.config.user;
 
 import app.sigorotalk.backend.domain.user.CustomUserDetailService;
 import app.sigorotalk.backend.domain.user.User;

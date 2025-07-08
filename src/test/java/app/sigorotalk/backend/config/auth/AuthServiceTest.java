@@ -1,6 +1,7 @@
-package app.sigorotalk.backend.config.jwt;
+package app.sigorotalk.backend.config.auth;
 
 import app.sigorotalk.backend.common.exception.BusinessException;
+import app.sigorotalk.backend.config.jwt.JwtTokenProvider;
 import app.sigorotalk.backend.domain.auth.AuthErrorCode;
 import app.sigorotalk.backend.domain.auth.AuthService;
 import app.sigorotalk.backend.domain.auth.dto.TokenRefreshResponseDto;
