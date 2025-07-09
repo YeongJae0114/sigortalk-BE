@@ -1,13 +1,42 @@
 package app.sigorotalk.backend.domain.mentor;
 
+import app.sigorotalk.backend.common.exception.BusinessException;
+import app.sigorotalk.backend.common.exception.CommonErrorCode;
+import app.sigorotalk.backend.domain.mentor.dto.MentorDetailResponseDto;
+import app.sigorotalk.backend.domain.mentor.dto.MentorListResponseDto;
+import app.sigorotalk.backend.domain.review.Review;
+import app.sigorotalk.backend.domain.review.ReviewRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MentorService {
 
-    // TODO: 멘토 목록 조회 로직 구현 (페이징, 정렬 포함)
+    private final MentorRepository mentorRepository;
+    private final ReviewRepository reviewRepository;
 
-    // TODO: 멘토 상세 조회 로직 구현
+    public Page<MentorListResponseDto> getMentorList(Pageable pageable) {
+        // TODO: 필터링 기능 추가 (region, expertise 등)
+        return mentorRepository.findAll(pageable)
+                .map(MentorListResponseDto::from);
+    }
+
+    public MentorDetailResponseDto getMentorDetail(Long mentorId) {
+        Mentor mentor = mentorRepository.findById(mentorId)
+                .orElseThrow(() -> new BusinessException(CommonErrorCode.NOT_FOUND));
+
+        // 멘토의 리뷰 목록 조회
+        List<Review> reviews = reviewRepository.findByCoffeeChatApplication_Mentor_Id(mentorId);
+
+        return MentorDetailResponseDto.from(mentor, reviews);
+    }
 
     // TODO: (관리자용) 멘토 등록 로직 구현
 
