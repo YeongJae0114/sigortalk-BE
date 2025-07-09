@@ -24,17 +24,6 @@ public class MentorDetailResponseDto {
     private final BigDecimal averageRating;
     private final List<ReviewDto> reviews;
 
-    @Getter
-        @Builder
-        private record ReviewDto(Integer rating, String comment) {
-            static ReviewDto from(Review review) {
-                return ReviewDto.builder()
-                        .rating(review.getRating())
-                        .comment(review.getComment())
-                        .build();
-            }
-        }
-
     public static MentorDetailResponseDto from(Mentor mentor, List<Review> reviews) {
         return MentorDetailResponseDto.builder()
                 .mentorId(mentor.getId())
@@ -48,5 +37,19 @@ public class MentorDetailResponseDto {
                 .averageRating(mentor.getAverageRating())
                 .reviews(reviews.stream().map(ReviewDto::from).collect(Collectors.toList()))
                 .build();
+    }
+
+    @Getter
+    @Builder
+    private static class ReviewDto { // private record -> private static class
+        private final Integer rating;
+        private final String comment;
+
+        static ReviewDto from(Review review) {
+            return ReviewDto.builder()
+                    .rating(review.getRating())
+                    .comment(review.getComment())
+                    .build();
+        }
     }
 }

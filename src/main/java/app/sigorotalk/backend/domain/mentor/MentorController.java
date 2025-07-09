@@ -26,7 +26,7 @@ public class MentorController {
     }
 
     @GetMapping("/{mentorId}")
-    public ResponseEntity<ApiResponse<MentorDetailResponseDto>> getMentorDetail(@PathVariable Long mentorId) {
+    public ResponseEntity<ApiResponse<MentorDetailResponseDto>> getMentorDetail(@PathVariable("mentorId") Long mentorId) {
         MentorDetailResponseDto mentorDetail = mentorService.getMentorDetail(mentorId);
         return ResponseEntity.ok(ApiResponse.success(mentorDetail));
     }
