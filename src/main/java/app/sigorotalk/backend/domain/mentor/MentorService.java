@@ -24,12 +24,12 @@ public class MentorService {
 
     public Page<MentorListResponseDto> getMentorList(Pageable pageable) {
         // TODO: 필터링 기능 추가 (region, expertise 등)
-        return mentorRepository.findAll(pageable)
+        return mentorRepository.findAllWithUser(pageable)
                 .map(MentorListResponseDto::from);
     }
 
     public MentorDetailResponseDto getMentorDetail(Long mentorId) {
-        Mentor mentor = mentorRepository.findById(mentorId)
+        Mentor mentor = mentorRepository.findByIdWithUser(mentorId)
                 .orElseThrow(() -> new BusinessException(CommonErrorCode.NOT_FOUND));
 
         // 멘토의 리뷰 목록 조회
