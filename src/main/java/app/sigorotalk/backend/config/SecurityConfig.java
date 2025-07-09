@@ -21,7 +21,7 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint) // 🔥 커스텀 EntryPoint 등록
                 )
-
+                .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/actuator/prometheus").permitAll() // 공개 URL
                         .anyRequest().authenticated() // 그 외 인증 필요
