@@ -13,9 +13,11 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // 모든 API 경로 허용
-                        .allowedOrigins("https://coffeebara-front.web.app",
-                                        "http://localhost:3000",  // 로컬 개발용 (localhost)
-                                        "http://127.0.0.1:3000"   // 로컬 개발용 (127.0.0.1))
+                        .allowedOrigins(
+                                "https://coffeebara-front.web.app",
+                                "http://localhost:3000",   // 로컬 개발용 (localhost)
+                                "http://127.0.0.1:3000"    // 로컬 개발용 (127.0.0.1)
+                        )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(false) 
