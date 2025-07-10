@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface MentorRepository extends JpaRepository<Mentor, Long> {
 
     // 멘토 목록 조회 시 N+1 문제 해결을 위해 User를 fetch join
-    @Query(value = "SELECT m FROM Mentor m JOIN FETCH m.user",
+    @Query(value = "SELECT m FROM Mentor m JOIN FETCH m.user ORDER BY m.id",
             countQuery = "SELECT COUNT(m) FROM Mentor m")
     Page<Mentor> findAllWithUser(Pageable pageable);
 
