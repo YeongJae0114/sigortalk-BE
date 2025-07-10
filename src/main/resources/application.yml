@@ -33,6 +33,23 @@ management:
     prometheus:
       enabled: true
 
+  observations:
+    http:
+      server:
+        requests:
+          record-exceptions: true  # ✅ 예외도 메트릭으로 기록
+
+  mvc:
+    throw-exception-if-no-handler-found: true # 없는 경로 요청 시 DispatcherServlet이 404 예외 던짐
+  web:
+    resources:
+      add-mappings: false # 정적 리소스 매핑 비활성화
+
+jwt:
+  secret: ${JWT_SECRET:defaultBase64EncodedSecret}
+  access-token-validity-in-seconds: ${JWT_ACCESS_TOKEN_VALIDITY:604800}  
+  refresh-token-validity-in-seconds: ${JWT_REFRESH_TOKEN_VALIDITY:604800} 
+
 logging:
   level:
     root: INFO
