@@ -45,6 +45,11 @@ management:
     resources:
       add-mappings: false # 정적 리소스 매핑 비활성화
 
+jwt:
+  secret: ${JWT_SECRET:defaultBase64EncodedSecret}
+  access-token-validity-in-seconds: ${JWT_ACCESS_TOKEN_VALIDITY:604800}  
+  refresh-token-validity-in-seconds: ${JWT_REFRESH_TOKEN_VALIDITY:604800} 
+
 logging:
   level:
     root: INFO
