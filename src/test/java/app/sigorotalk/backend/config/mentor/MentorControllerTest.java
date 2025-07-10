@@ -59,7 +59,7 @@ class MentorControllerTest {
     @Test
     @DisplayName("멘토 목록 조회 API 성공: 200 OK와 함께 페이징된 데이터를 반환한다.")
     @WithMockUser
-        // 인증된 사용자로 간주
+    // 인증된 사용자로 간주
     void getMentorListApi_Success() throws Exception {
         // when & then
         mockMvc.perform(get("/api/v1/mentors")
