@@ -58,17 +58,17 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             set -e
-
+          
             IMAGE_NAME="zerojae175/sigortalk"
             TAG="latest"
-
+          
             echo "📥 Pulling Docker image: $IMAGE_NAME:$TAG"
             docker pull $IMAGE_NAME:$TAG
-
+          
             echo "🛑 Stopping and removing old container: sigortalk"
             docker stop sigortalk || true
             docker rm sigortalk || true
-
+          
             echo "🚀 Running new container: sigortalk"
             docker run -d --restart unless-stopped \
               --name sigortalk \
@@ -83,6 +83,9 @@ jobs:
               -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
               -e DB_NAME="${{ secrets.DB_NAME }}" \
               -e DB_ROOT_PASSWORD="${{ secrets.DB_ROOT_PASSWORD }}" \
+              -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+              -e JWT_ACCESS_TOKEN_VALIDITY="${{ secrets.JWT_ACCESS_TOKEN_VALIDITY }}" \
+              -e JWT_REFRESH_TOKEN_VALIDITY="${{ secrets.JWT_REFRESH_TOKEN_VALIDITY }}" \
               $IMAGE_NAME:$TAG
-
-            echo "✅ Deployment to oce (main) completed!"
+          
+            echo "✅ Deployment(main) completed!"
