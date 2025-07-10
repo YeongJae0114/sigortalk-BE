@@ -1,8 +1,5 @@
 package app.sigorotalk.backend.common.exception;
 
-import static app.sigorotalk.backend.common.exception.CommonErrorCode.BAD_REQUEST;
-import static app.sigorotalk.backend.common.exception.CommonErrorCode.SYSTEM_ERROR;
-
 import app.sigorotalk.backend.common.response.ApiResponse;
 import app.sigorotalk.backend.common.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,15 +7,37 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static app.sigorotalk.backend.common.exception.CommonErrorCode.*;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+
+    /**
+     * 인증 실패 예외 처리 (BadCredentialsException 등)
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthenticationException(AuthenticationException e) {
+        log.warn("인증 실패: {}", e.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                CommonErrorCode.UNAUTHORIZED.getCode(),
+                "이메일 또는 비밀번호가 일치하지 않습니다." // 사용자에게 보여줄 메시지
+        );
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED) // 401 상태 코드
+                .body(ApiResponse.fail(errorResponse));
+    }
 
     /**
      * 비즈니스 예외 처리
@@ -65,16 +84,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleValidationException(MethodArgumentNotValidException e) {
         log.warn("Method Argument Not Valid Exception 발생: {}", e.getMessage());
 
-        String errorMessage = e.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(fieldError -> fieldError.getDefaultMessage())
-                .findFirst()
-                .orElse("잘못된 요청입니다.");
+        Map<String, String> errors = new HashMap<>();
+        e.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                INVALID_PARAMETER.getCode(),
+                INVALID_PARAMETER.getMessage(),
+                errors
+        );
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.fail(new ErrorResponse(400, errorMessage)));
+                .body(ApiResponse.fail(errorResponse));
     }
 
     /**
