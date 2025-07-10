@@ -4,9 +4,7 @@ package app.sigorotalk.backend.domain.mentor;
 import app.sigorotalk.backend.common.entity.BaseTimeEntity;
 import app.sigorotalk.backend.domain.user.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -14,6 +12,8 @@ import java.math.BigDecimal;
 @Table(name = "tb_mentor")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class Mentor extends BaseTimeEntity {
 
     @Id
