@@ -36,3 +36,8 @@ management:
 logging:
   level:
     root: INFO
+
+jwt:
+  secret: V2VMa2VTaWdvcm90YWxrQW5kSXRzQmVzdG9mQmVzdFNlY3JldEtleUZvclByb2plY3Q= # <-- 64바이트 이상의 Base64 인코딩된 문자열
+  access-token-validity-in-seconds: 86400 # 24시간
+  refresh-token-validity-in-seconds: 604800 # 7일
