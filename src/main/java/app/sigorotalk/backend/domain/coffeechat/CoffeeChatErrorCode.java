@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 public enum CoffeeChatErrorCode implements ErrorCode {
 
     MENTOR_NOT_FOUND(HttpStatus.NOT_FOUND, 404, "해당 멘토 정보를 찾을 수 없습니다."),
-    MENTEE_NOT_FOUND(HttpStatus.NOT_FOUND, 404, "해당 멘티 정보를 찾을 수 없습니다."),
     COFFEE_CHAT_NOT_FOUND(HttpStatus.NOT_FOUND, 404, "해당 커피챗 신청 정보를 찾을 수 없습니다."),
     NO_AUTHORITY_TO_UPDATE_STATUS(HttpStatus.FORBIDDEN, 403, "해당 커피챗의 상태를 변경할 권한이 없습니다."),
     INVALID_STATUS_FOR_COMPLETION(HttpStatus.BAD_REQUEST, 400, "수락(ACCEPTED) 상태의 커피챗만 완료 처리할 수 있습니다."),

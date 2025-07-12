@@ -1,7 +1,9 @@
 package app.sigorotalk.backend.config.coffeechat;
 
+import app.sigorotalk.backend.common.exception.BusinessException;
 import app.sigorotalk.backend.domain.coffeechat.CoffeeChatApplication;
 import app.sigorotalk.backend.domain.coffeechat.CoffeeChatApplicationRepository;
+import app.sigorotalk.backend.domain.coffeechat.CoffeeChatErrorCode;
 import app.sigorotalk.backend.domain.coffeechat.CoffeeChatService;
 import app.sigorotalk.backend.domain.coffeechat.dto.CoffeeChatApplyRequestDto;
 import app.sigorotalk.backend.domain.coffeechat.dto.CoffeeChatApplyResponseDto;
@@ -9,6 +11,7 @@ import app.sigorotalk.backend.domain.coffeechat.dto.MyChatListResponseDto;
 import app.sigorotalk.backend.domain.mentor.Mentor;
 import app.sigorotalk.backend.domain.mentor.MentorRepository;
 import app.sigorotalk.backend.domain.user.User;
+import app.sigorotalk.backend.domain.user.UserErrorCode;
 import app.sigorotalk.backend.domain.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -130,4 +134,62 @@ class CoffeeChatServiceTest {
         assertThat(result).hasSize(2);
         verify(coffeeChatApplicationRepository, times(1)).findMyChatsByUserId(userId);
     }
+
+    @Test
+    @DisplayName("신청 실패: 멘티를 찾을 수 없으면 BusinessException이 발생한다.")
+    void applyForChat_Failure_MenteeNotFound() {
+        // given
+        long nonExistentMenteeId = 99L;
+        CoffeeChatApplyRequestDto requestDto = new CoffeeChatApplyRequestDto();
+        ReflectionTestUtils.setField(requestDto, "mentorId", 1L);
+
+        when(userRepository.findById(nonExistentMenteeId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> coffeeChatService.applyForChat(requestDto, nonExistentMenteeId))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(UserErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("신청 실패: 멘토를 찾을 수 없으면 BusinessException이 발생한다.")
+    void applyForChat_Failure_MentorNotFound() {
+        // given
+        long menteeId = 1L;
+        long nonExistentMentorId = 99L;
+        CoffeeChatApplyRequestDto requestDto = new CoffeeChatApplyRequestDto();
+        ReflectionTestUtils.setField(requestDto, "mentorId", nonExistentMentorId);
+
+        when(userRepository.findById(menteeId)).thenReturn(Optional.of(User.builder().id(menteeId).build()));
+        when(mentorRepository.findById(nonExistentMentorId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> coffeeChatService.applyForChat(requestDto, menteeId))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(CoffeeChatErrorCode.MENTOR_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("상태 변경 실패: 신청서가 존재하지 않으면 BusinessException이 발생한다.")
+    void statusUpdate_Failure_ApplicationNotFound() {
+        // given
+        long nonExistentApplicationId = 99L;
+        long userId = 1L;
+
+        when(coffeeChatApplicationRepository.findById(nonExistentApplicationId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> coffeeChatService.acceptChat(nonExistentApplicationId, userId))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(CoffeeChatErrorCode.COFFEE_CHAT_NOT_FOUND.getMessage());
+
+        assertThatThrownBy(() -> coffeeChatService.rejectChat(nonExistentApplicationId, userId))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(CoffeeChatErrorCode.COFFEE_CHAT_NOT_FOUND.getMessage());
+
+        assertThatThrownBy(() -> coffeeChatService.completeChat(nonExistentApplicationId, userId))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(CoffeeChatErrorCode.COFFEE_CHAT_NOT_FOUND.getMessage());
+    }
+
 }

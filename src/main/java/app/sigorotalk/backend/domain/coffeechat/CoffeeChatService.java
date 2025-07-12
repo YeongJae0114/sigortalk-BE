@@ -27,8 +27,7 @@ public class CoffeeChatService {
 
     @Transactional
     public CoffeeChatApplyResponseDto applyForChat(CoffeeChatApplyRequestDto requestDto, Long menteeId) {
-        User mentee = userRepository.findById(menteeId)
-                .orElseThrow(() -> new BusinessException(CoffeeChatErrorCode.MENTEE_NOT_FOUND));
+        User mentee = findUserById(menteeId);
         Mentor mentor = mentorRepository.findById(requestDto.getMentorId())
                 .orElseThrow(() -> new BusinessException(CoffeeChatErrorCode.MENTOR_NOT_FOUND));
 
