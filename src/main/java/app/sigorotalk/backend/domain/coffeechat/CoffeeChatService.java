@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +26,13 @@ public class CoffeeChatService {
     private final UserRepository userRepository;
     private final MentorRepository mentorRepository;
 
+    /**
+     * 멘티가 멘토에게 커피챗을 신청합니다.
+     *
+     * @param requestDto 멘토 ID를 포함한 요청 DTO
+     * @param menteeId   신청하는 멘티의 ID
+     * @return 생성된 커피챗 신청 정보
+     */
     @Transactional
     public CoffeeChatApplyResponseDto applyForChat(CoffeeChatApplyRequestDto requestDto, Long menteeId) {
         User mentee = findUserById(menteeId);
@@ -42,6 +50,12 @@ public class CoffeeChatService {
         return CoffeeChatApplyResponseDto.from(savedApplication);
     }
 
+    /**
+     * 특정 사용자가 관련된 모든 커피챗 목록을 조회합니다.
+     *
+     * @param userId 조회할 사용자의 ID
+     * @return 커피챗 목록 DTO 리스트
+     */
     @Transactional(readOnly = true)
     public List<MyChatListResponseDto> getMyChats(Long userId) {
         List<CoffeeChatApplication> myApplications = coffeeChatApplicationRepository.findMyChatsByUserId(userId);
@@ -50,33 +64,54 @@ public class CoffeeChatService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 멘토가 커피챗 신청을 수락합니다.
+     *
+     * @param applicationId 신청 ID
+     * @param mentorUserId  수락하는 멘토의 ID
+     * @return 상태 변경 결과
+     */
     @Transactional
     public ChatStatusUpdateResponseDto acceptChat(Long applicationId, Long mentorUserId) {
-        CoffeeChatApplication application = findApplicationById(applicationId);
-        User mentorUser = findUserById(mentorUserId);
-
-        application.accept(mentorUser);
-
-        return ChatStatusUpdateResponseDto.from(application);
+        return updateStatus(applicationId, mentorUserId, CoffeeChatApplication::accept);
     }
 
+    /**
+     * 멘토가 커피챗 신청을 거절합니다.
+     *
+     * @param applicationId 신청 ID
+     * @param mentorUserId  거절하는 멘토의 ID
+     * @return 상태 변경 결과
+     */
     @Transactional
     public ChatStatusUpdateResponseDto rejectChat(Long applicationId, Long mentorUserId) {
-        CoffeeChatApplication application = findApplicationById(applicationId);
-        User mentorUser = findUserById(mentorUserId);
-
-        application.reject(mentorUser);
-
-        return ChatStatusUpdateResponseDto.from(application);
+        return updateStatus(applicationId, mentorUserId, CoffeeChatApplication::reject);
     }
 
+    /**
+     * 멘티가 커피챗을 완료 처리합니다.
+     *
+     * @param applicationId 신청 ID
+     * @param menteeUserId  완료하는 멘티의 ID
+     * @return 상태 변경 결과
+     */
     @Transactional
     public ChatStatusUpdateResponseDto completeChat(Long applicationId, Long menteeUserId) {
+        return updateStatus(applicationId, menteeUserId, CoffeeChatApplication::complete);
+    }
+
+    /**
+     * 상태 변경 로직을 처리하는 공통 헬퍼 메서드
+     *
+     * @param applicationId 신청 ID
+     * @param userId        요청한 사용자의 ID
+     * @param action        엔티티의 상태 변경 메서드 (e.g., application::accept)
+     * @return 상태 변경 결과 DTO
+     */
+    private ChatStatusUpdateResponseDto updateStatus(Long applicationId, Long userId, BiConsumer<CoffeeChatApplication, User> action) {
         CoffeeChatApplication application = findApplicationById(applicationId);
-        User menteeUser = findUserById(menteeUserId);
-
-        application.complete(menteeUser);
-
+        User user = findUserById(userId);
+        action.accept(application, user);
         return ChatStatusUpdateResponseDto.from(application);
     }
 

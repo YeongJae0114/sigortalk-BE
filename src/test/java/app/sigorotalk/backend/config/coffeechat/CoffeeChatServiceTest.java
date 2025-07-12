@@ -120,19 +120,33 @@ class CoffeeChatServiceTest {
     void getMyChats_Success() {
         // given
         long userId = 1L;
-        User user = User.builder().id(userId).name("테스트유저").build();
-        Mentor mentor = Mentor.builder().user(user).build();
-        CoffeeChatApplication app1 = CoffeeChatApplication.builder().mentor(mentor).mentee(user).status(CoffeeChatApplication.Status.PENDING).build();
-        CoffeeChatApplication app2 = CoffeeChatApplication.builder().mentor(mentor).mentee(user).status(CoffeeChatApplication.Status.ACCEPTED).build();
+        User menteeUser = User.builder().id(userId).name("테스트멘티").build();
+        User mentorUser = User.builder().id(2L).name("테스트멘토").build();
+        Mentor mentor = Mentor.builder().user(mentorUser).profileImageUrl("mentor.jpg").build();
 
-        when(coffeeChatApplicationRepository.findMyChatsByUserId(userId)).thenReturn(List.of(app1, app2));
+        CoffeeChatApplication app1 = CoffeeChatApplication.builder()
+                .id(100L)
+                .mentor(mentor)
+                .mentee(menteeUser)
+                .status(CoffeeChatApplication.Status.ACCEPTED)
+                .build();
+
+        when(coffeeChatApplicationRepository.findMyChatsByUserId(userId)).thenReturn(List.of(app1));
 
         // when
         List<MyChatListResponseDto> result = coffeeChatService.getMyChats(userId);
 
         // then
-        assertThat(result).hasSize(2);
         verify(coffeeChatApplicationRepository, times(1)).findMyChatsByUserId(userId);
+
+        // DTO의 내용까지 상세하게 검증
+        assertThat(result).hasSize(1);
+        MyChatListResponseDto resultDto = result.get(0);
+        assertThat(resultDto.applicationId()).isEqualTo(100L);
+        assertThat(resultDto.mentor().name()).isEqualTo("테스트멘토");
+        assertThat(resultDto.mentee().name()).isEqualTo("테스트멘티");
+        assertThat(resultDto.status()).isEqualTo("ACCEPTED");
+        assertThat(resultDto.mentor().profileImageUrl()).isEqualTo("mentor.jpg");
     }
 
     @Test
