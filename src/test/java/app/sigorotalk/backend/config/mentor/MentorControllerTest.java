@@ -88,6 +88,39 @@ class MentorControllerTest {
     }
 
     @Test
+    @DisplayName("멘토 목록 조회 API 성공: 필터링 조건과 함께 요청 시, 조건에 맞는 데이터만 반환한다.")
+    @WithMockUser
+    void getMentorListApi_WithFilter_Success() throws Exception {
+        // given
+        // 테스트 데이터 추가: 서울 지역, 다른 전문분야의 멘토
+        User anotherUser = User.builder()
+                .email("mentor2@example.com")
+                .password("password")
+                .name("다른멘토")
+                .role(User.Role.ROLE_MENTOR)
+                .build();
+        userRepository.save(anotherUser);
+
+        Mentor anotherMentor = Mentor.builder()
+                .user(anotherUser)
+                .region("서울") // 이 멘토는 '서울' 지역
+                .expertise("Python, Django") // 전문 분야는 다름
+                .build();
+        mentorRepository.save(anotherMentor);
+
+        // when & then: '서울' 지역으로만 필터링하여 API 호출
+        mockMvc.perform(get("/api/v1/mentors")
+                        .param("region", "서울") // '서울' 지역으로 필터링
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.response.content").isArray())
+                .andExpect(jsonPath("$.response.content.length()").value(1)) // 결과가 1개여야 함
+                .andExpect(jsonPath("$.response.content[0].name").value("다른멘토")) // '다른멘토'만 조회되어야 함
+                .andDo(print());
+    }
+
+    @Test
     @DisplayName("멘토 상세 조회 API 실패: 존재하지 않는 ID 요청 시 404 Not Found를 반환한다.")
     @WithMockUser
     void getMentorDetailApi_Failure_NotFound() throws Exception {

@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/mentors")
@@ -20,8 +17,12 @@ public class MentorController {
     private final MentorService mentorService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<MentorListResponseDto>>> getMentorList(Pageable pageable) {
-        Page<MentorListResponseDto> mentorList = mentorService.getMentorList(pageable);
+    public ResponseEntity<ApiResponse<Page<MentorListResponseDto>>> getMentorList(
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String expertise,
+            Pageable pageable
+    ) {
+        Page<MentorListResponseDto> mentorList = mentorService.getMentorList(region, expertise, pageable); // 수정
         return ResponseEntity.ok(ApiResponse.success(mentorList));
     }
 

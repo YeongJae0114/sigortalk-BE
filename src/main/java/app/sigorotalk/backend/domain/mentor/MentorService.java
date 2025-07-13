@@ -22,9 +22,8 @@ public class MentorService {
     private final MentorRepository mentorRepository;
     private final ReviewRepository reviewRepository;
 
-    public Page<MentorListResponseDto> getMentorList(Pageable pageable) {
-        // TODO: 필터링 기능 추가 (region, expertise 등)
-        return mentorRepository.findAllWithUser(pageable)
+    public Page<MentorListResponseDto> getMentorList(String region, String expertise, Pageable pageable) {
+        return mentorRepository.findByFilters(region, expertise, pageable)
                 .map(MentorListResponseDto::from);
     }
 

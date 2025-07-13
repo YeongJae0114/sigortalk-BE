@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,14 +47,37 @@ class MentorServiceTest {
         Page<Mentor> mentorPage = new PageImpl<>(Collections.singletonList(testMentor));
         Pageable pageable = PageRequest.of(0, 10);
 
-        when(mentorRepository.findAllWithUser(any(Pageable.class))).thenReturn(mentorPage);
+        // 필터링 조건이 없는 경우를 테스트하기 위해 region과 expertise에 null을 전달합니다.
+        when(mentorRepository.findByFilters(null, null, pageable)).thenReturn(mentorPage);
 
-        // when
-        var result = mentorService.getMentorList(pageable);
+        var result = mentorService.getMentorList(null, null, pageable);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(1);
         assertThat(result.getContent().get(0).getName()).isEqualTo("테스트 멘토");
+    }
+
+    @Test
+    @DisplayName("멘토 목록 조회 성공: 필터링 조건이 있을 경우, 조건에 맞는 목록을 반환한다.")
+    void getMentorList_WithFilters_Success() {
+        // given
+        String region = "서울";
+        String expertise = "IT";
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // 서울, IT 전문가인 멘토 1명만 포함된 페이지를 반환하도록 설정
+        User testUser = User.builder().name("서울 IT 멘토").build();
+        Mentor testMentor = Mentor.builder().user(testUser).region(region).expertise(expertise).build();
+        Page<Mentor> filteredPage = new PageImpl<>(Collections.singletonList(testMentor));
+
+        when(mentorRepository.findByFilters(region, expertise, pageable)).thenReturn(filteredPage);
+
+        // when
+        var result = mentorService.getMentorList(region, expertise, pageable);
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).getName()).isEqualTo("서울 IT 멘토");
     }
 
     @Test
