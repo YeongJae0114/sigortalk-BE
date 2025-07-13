@@ -78,6 +78,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 요청 파라미터 검증 실패 처리
+     *
      * @Valid 어노테이션 검증 실패 시 발생
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)

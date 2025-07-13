@@ -2,13 +2,13 @@ package app.sigorotalk.backend.config.handler;
 
 import app.sigorotalk.backend.common.response.ApiResponse;
 import app.sigorotalk.backend.common.response.ErrorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
