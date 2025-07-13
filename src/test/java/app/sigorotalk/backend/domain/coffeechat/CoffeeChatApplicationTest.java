@@ -1,7 +1,6 @@
-package app.sigorotalk.backend.config.coffeechat;
+package app.sigorotalk.backend.domain.coffeechat;
 
 import app.sigorotalk.backend.common.exception.BusinessException;
-import app.sigorotalk.backend.domain.coffeechat.CoffeeChatApplication;
 import app.sigorotalk.backend.domain.mentor.Mentor;
 import app.sigorotalk.backend.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;

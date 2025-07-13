@@ -1,7 +1,5 @@
-package app.sigorotalk.backend.config.mentor;
+package app.sigorotalk.backend.domain.mentor;
 
-import app.sigorotalk.backend.domain.mentor.Mentor;
-import app.sigorotalk.backend.domain.mentor.MentorRepository;
 import app.sigorotalk.backend.domain.user.User;
 import app.sigorotalk.backend.domain.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;

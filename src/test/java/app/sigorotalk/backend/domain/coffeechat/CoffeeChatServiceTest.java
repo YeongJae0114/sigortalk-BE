@@ -1,10 +1,6 @@
-package app.sigorotalk.backend.config.coffeechat;
+package app.sigorotalk.backend.domain.coffeechat;
 
 import app.sigorotalk.backend.common.exception.BusinessException;
-import app.sigorotalk.backend.domain.coffeechat.CoffeeChatApplication;
-import app.sigorotalk.backend.domain.coffeechat.CoffeeChatApplicationRepository;
-import app.sigorotalk.backend.domain.coffeechat.CoffeeChatErrorCode;
-import app.sigorotalk.backend.domain.coffeechat.CoffeeChatService;
 import app.sigorotalk.backend.domain.coffeechat.dto.CoffeeChatApplyRequestDto;
 import app.sigorotalk.backend.domain.coffeechat.dto.CoffeeChatApplyResponseDto;
 import app.sigorotalk.backend.domain.coffeechat.dto.MyChatListResponseDto;

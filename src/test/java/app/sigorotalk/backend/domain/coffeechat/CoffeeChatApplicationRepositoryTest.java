@@ -1,8 +1,6 @@
-package app.sigorotalk.backend.config.coffeechat;
+package app.sigorotalk.backend.domain.coffeechat;
 
 import app.sigorotalk.backend.config.QueryDslConfig;
-import app.sigorotalk.backend.domain.coffeechat.CoffeeChatApplication;
-import app.sigorotalk.backend.domain.coffeechat.CoffeeChatApplicationRepository;
 import app.sigorotalk.backend.domain.mentor.Mentor;
 import app.sigorotalk.backend.domain.mentor.MentorRepository;
 import app.sigorotalk.backend.domain.user.User;

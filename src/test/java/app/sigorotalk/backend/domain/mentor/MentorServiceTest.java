@@ -1,9 +1,6 @@
-package app.sigorotalk.backend.config.mentor;
+package app.sigorotalk.backend.domain.mentor;
 
 import app.sigorotalk.backend.common.exception.BusinessException;
-import app.sigorotalk.backend.domain.mentor.Mentor;
-import app.sigorotalk.backend.domain.mentor.MentorRepository;
-import app.sigorotalk.backend.domain.mentor.MentorService;
 import app.sigorotalk.backend.domain.review.Review;
 import app.sigorotalk.backend.domain.review.ReviewRepository;
 import app.sigorotalk.backend.domain.user.User;

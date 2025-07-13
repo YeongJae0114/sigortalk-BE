@@ -1,9 +1,6 @@
-package app.sigorotalk.backend.config.user;
+package app.sigorotalk.backend.domain.user;
 
 import app.sigorotalk.backend.common.exception.BusinessException;
-import app.sigorotalk.backend.domain.user.User;
-import app.sigorotalk.backend.domain.user.UserRepository;
-import app.sigorotalk.backend.domain.user.UserService;
 import app.sigorotalk.backend.domain.user.dto.SignUpRequestDto;
 import app.sigorotalk.backend.domain.user.dto.UserResponseDto;
 import org.junit.jupiter.api.DisplayName;
