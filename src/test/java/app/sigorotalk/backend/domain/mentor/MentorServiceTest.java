@@ -2,6 +2,7 @@ package app.sigorotalk.backend.domain.mentor;
 
 import app.sigorotalk.backend.common.exception.BusinessException;
 import app.sigorotalk.backend.domain.review.Review;
+import app.sigorotalk.backend.domain.review.ReviewCreatedEvent;
 import app.sigorotalk.backend.domain.review.ReviewRepository;
 import app.sigorotalk.backend.domain.user.User;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MentorServiceTest {
@@ -34,6 +35,9 @@ class MentorServiceTest {
 
     @Mock
     private ReviewRepository reviewRepository;
+
+    @Mock
+    private MentorAsyncService mentorAsyncService;
 
     @Test
     @DisplayName("멘토 목록 조회 성공: 페이징된 멘토 목록을 DTO로 변환하여 반환한다.")
@@ -107,5 +111,20 @@ class MentorServiceTest {
         assertThatThrownBy(() -> mentorService.getMentorDetail(999L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("요청한 리소스를 찾을 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("성공: ReviewCreatedEvent가 발생하면, MentorAsyncService를 통해 평점 업데이트를 요청한다.")
+    void handleReviewCreatedEvent_Should_Call_AsyncService() {
+        // given
+        Long mentorId = 1L;
+        ReviewCreatedEvent event = new ReviewCreatedEvent(mentorId);
+
+        // when
+        mentorService.handleReviewCreatedEvent(event);
+
+        // then
+        // mentorAsyncService.updateMentorRating(mentorId)가 1번 호출되었는지 검증
+        verify(mentorAsyncService, times(1)).updateMentorRating(mentorId);
     }
 }
