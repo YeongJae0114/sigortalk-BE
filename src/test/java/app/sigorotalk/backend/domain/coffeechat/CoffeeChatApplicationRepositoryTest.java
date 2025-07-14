@@ -1,7 +1,6 @@
-package app.sigorotalk.backend.config.coffeechat;
+package app.sigorotalk.backend.domain.coffeechat;
 
-import app.sigorotalk.backend.domain.coffeechat.CoffeeChatApplication;
-import app.sigorotalk.backend.domain.coffeechat.CoffeeChatApplicationRepository;
+import app.sigorotalk.backend.config.QueryDslConfig;
 import app.sigorotalk.backend.domain.mentor.Mentor;
 import app.sigorotalk.backend.domain.mentor.MentorRepository;
 import app.sigorotalk.backend.domain.user.User;
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -19,6 +19,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@Import(QueryDslConfig.class)
 class CoffeeChatApplicationRepositoryTest {
 
     @Autowired

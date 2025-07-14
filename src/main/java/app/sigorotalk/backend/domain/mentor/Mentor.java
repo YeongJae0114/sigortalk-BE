@@ -45,4 +45,9 @@ public class Mentor extends BaseTimeEntity {
     private BigDecimal averageRating;
 
     private Integer reviewCount;
+
+    public void updateRating(BigDecimal averageRating, Integer reviewCount) {
+        this.averageRating = averageRating;
+        this.reviewCount = reviewCount;
+    }
 }

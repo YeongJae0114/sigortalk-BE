@@ -3,14 +3,14 @@ package app.sigorotalk.backend.domain.review;
 import app.sigorotalk.backend.common.entity.BaseTimeEntity;
 import app.sigorotalk.backend.domain.coffeechat.CoffeeChatApplication;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "tb_review")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class Review extends BaseTimeEntity {
 
     @Id
