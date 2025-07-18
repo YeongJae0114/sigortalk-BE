@@ -72,8 +72,7 @@ jobs:
             echo "🚀 Running new container: sigortalk"
             docker run -d --restart unless-stopped \
               --name sigortalk \
-              --network app-net \
-              -p 8080:8080 \
+                --network host \
               -e SPRING_PROFILES_ACTIVE=production \
               -e SERVER_PORT="8080" \
               -e DB_URL="${{ secrets.DB_URL }}" \
