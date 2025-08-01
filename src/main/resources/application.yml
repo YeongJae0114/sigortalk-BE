@@ -62,7 +62,7 @@ springdoc:
 
 
 jwt:
-  secret: ${JWT_SECRET:defaultBase64EncodedSecret}
+  secret: "dGVzdC1zZWNyZXQta2V5LXRlbXAasdasdaaaatYWJjMTIzIQ=="
   access-token-validity-in-seconds: ${JWT_ACCESS_TOKEN_VALIDITY:604800}
   refresh-token-validity-in-seconds: ${JWT_REFRESH_TOKEN_VALIDITY:604800} 
 

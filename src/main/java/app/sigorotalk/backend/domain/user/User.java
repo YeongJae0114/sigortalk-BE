@@ -1,12 +1,17 @@
 package app.sigorotalk.backend.domain.user;
 
 import app.sigorotalk.backend.common.entity.BaseTimeEntity;
+import app.sigorotalk.backend.domain.farmer.Farmer;
+import app.sigorotalk.backend.domain.order.Order;
+import app.sigorotalk.backend.domain.review.Review;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.*;
 
 
 @Entity
-@Table(name = "tb_user")
+@Table(name = "users")
 @Getter
 @Builder
 @AllArgsConstructor
@@ -28,6 +33,16 @@ public class User extends BaseTimeEntity {
 
     @Column(length = 20) // 새로 추가된 필드
     private String phoneNumber;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Farmer farmer;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
 
     @Enumerated(EnumType.STRING) // Enum 타입을 문자열로 저장
     @Column(nullable = false, length = 20)
