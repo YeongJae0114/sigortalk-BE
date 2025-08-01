@@ -113,7 +113,7 @@ class AuthServiceTest {
                 .email(email)
                 .password("some-password")
                 .name("Test User")
-                .role(User.Role.ROLE_USER)
+                .userType(User.UserType.BUYER)
                 .build();
 
         Authentication authentication = createTestAuthentication("1"); // 헬퍼 메서드 사용

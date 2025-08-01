@@ -17,27 +17,31 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 100)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 50)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private Role role;
+    @Column(length = 20) // 새로 추가된 필드
+    private String phoneNumber;
 
-    @Column(length = 500) // JWT 길이를 고려하여 충분한 길이 설정
+    @Enumerated(EnumType.STRING) // Enum 타입을 문자열로 저장
+    @Column(nullable = false, length = 20)
+    private UserType userType; // Role -> UserType 으로 변경
+
+    // refreshToken 필드는 인증에 필요하므로 그대로 둡니다.
+    @Column(length = 500)
     private String refreshToken;
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
 
-    public enum Role {
-        ROLE_USER, ROLE_MENTOR
+    public enum UserType {
+        BUYER, FARMER
     }
 }

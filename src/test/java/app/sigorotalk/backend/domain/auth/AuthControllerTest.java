@@ -49,7 +49,7 @@ class AuthControllerTest {
                 .email(testEmail)
                 .password(passwordEncoder.encode(testPassword))
                 .name("Test User")
-                .role(User.Role.ROLE_USER)
+                .userType(User.UserType.BUYER)
                 .build();
         userRepository.save(testUser);
     }
@@ -70,7 +70,7 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.response.accessToken").exists())
                 .andExpect(jsonPath("$.response.user.name").value("Test User"))
                 .andExpect(jsonPath("$.response.user.email").value(testEmail))
-                .andExpect(jsonPath("$.response.user.role").value("ROLE_USER"))
+                .andExpect(jsonPath("$.response.user.role").value("BUYER"))
                 .andExpect(cookie().exists("refresh_token"))
                 .andExpect(cookie().httpOnly("refresh_token", true))
                 .andExpect(cookie().path("refresh_token", "/"))
