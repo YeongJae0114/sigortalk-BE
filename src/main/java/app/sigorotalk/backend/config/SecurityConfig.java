@@ -21,9 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     public static final String[] SWAGGER_URLS = {
             "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/docs/**"
+            "/swagger-ui/**"
     };
 
     private final JwtTokenProvider jwtTokenProvider;
