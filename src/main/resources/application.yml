@@ -45,9 +45,24 @@ management:
     resources:
       add-mappings: false # 정적 리소스 매핑 비활성화
 
+springdoc:
+  swagger-ui:
+    enabled: true                # Swagger UI 활성화
+    path: /docs                 # Swagger UI 접속 경로
+    deep-linking: true         # URL 복사 시 특정 API로 직접 이동 가능
+    default-models-expand-depth: 1
+    default-model-expand-depth: 1
+    default-model-rendering: model
+    display-request-duration: true
+    doc-expansion: none        # 초기엔 닫힌 상태로
+    filter: true               # 필터 입력창 표시
+    operations-sorter: method # 메서드 순 정렬
+    tags-sorter: alpha         # 태그 이름 알파벳 순 정렬
+
+
 jwt:
   secret: ${JWT_SECRET:defaultBase64EncodedSecret}
-  access-token-validity-in-seconds: ${JWT_ACCESS_TOKEN_VALIDITY:604800}  
+  access-token-validity-in-seconds: ${JWT_ACCESS_TOKEN_VALIDITY:604800}
   refresh-token-validity-in-seconds: ${JWT_REFRESH_TOKEN_VALIDITY:604800} 
 
 logging:
