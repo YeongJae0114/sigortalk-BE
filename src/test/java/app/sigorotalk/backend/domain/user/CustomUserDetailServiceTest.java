@@ -1,8 +1,5 @@
-package app.sigorotalk.backend.config.user;
+package app.sigorotalk.backend.domain.user;
 
-import app.sigorotalk.backend.domain.user.CustomUserDetailService;
-import app.sigorotalk.backend.domain.user.User;
-import app.sigorotalk.backend.domain.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +36,7 @@ class CustomUserDetailServiceTest {
                 .email(userEmail)
                 .password("password123")
                 .name("Test User")
-                .role(User.Role.ROLE_USER)
+                .userType(User.UserType.BUYER)
                 .build();
         // userRepository.findByEmail(userEmail)이 호출되면,
         // Optional.of(testUser)를 반환하라고 미리 약속(stub)합니다.
@@ -52,7 +49,7 @@ class CustomUserDetailServiceTest {
         assertThat(userDetails.getUsername()).isEqualTo("1"); // principal은 userId로 설정했으므로 "1"
         assertThat(userDetails.getPassword()).isEqualTo("password123");
         assertThat(userDetails.getAuthorities()).hasSize(1);
-        assertThat(userDetails.getAuthorities().iterator().next().getAuthority()).isEqualTo("ROLE_USER");
+        assertThat(userDetails.getAuthorities().iterator().next().getAuthority()).isEqualTo("BUYER");
     }
 
     @Test

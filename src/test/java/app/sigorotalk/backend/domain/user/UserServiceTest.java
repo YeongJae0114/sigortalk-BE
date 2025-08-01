@@ -1,9 +1,6 @@
-package app.sigorotalk.backend.config.user;
+package app.sigorotalk.backend.domain.user;
 
 import app.sigorotalk.backend.common.exception.BusinessException;
-import app.sigorotalk.backend.domain.user.User;
-import app.sigorotalk.backend.domain.user.UserRepository;
-import app.sigorotalk.backend.domain.user.UserService;
 import app.sigorotalk.backend.domain.user.dto.SignUpRequestDto;
 import app.sigorotalk.backend.domain.user.dto.UserResponseDto;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +36,7 @@ class UserServiceTest {
     void signup_Success() {
         // given
         // 헬퍼 메소드를 사용하여 DTO 생성
-        SignUpRequestDto requestDto = createSignUpRequestDto("newuser@example.com", "password123", "새싹");
+        SignUpRequestDto requestDto = createSignUpRequestDto("newuser@example.com", "password123", "새싹", User.UserType.BUYER);
         User userEntity = requestDto.toEntity(passwordEncoder);
 
         when(userRepository.findByEmail(requestDto.getEmail())).thenReturn(Optional.empty());
@@ -57,7 +54,8 @@ class UserServiceTest {
     @DisplayName("회원가입 실패: 이미 존재하는 이메일로 가입 시, BusinessException을 발생시킨다.")
     void signup_Failure_EmailAlreadyExists() {
         // given
-        SignUpRequestDto requestDto = createSignUpRequestDto("exists@example.com", "password123", "중복");
+        SignUpRequestDto requestDto = createSignUpRequestDto("exists@example.com", "password123", "중복", User.UserType.FARMER);
+
 
         // [문제 2 해결책]
         // new User() 대신, 빌더를 사용하여 유효한 User 객체를 생성합니다.
@@ -78,12 +76,13 @@ class UserServiceTest {
     }
 
     // SignUpRequestDto 생성을 위한 private 헬퍼 메소드
-    private SignUpRequestDto createSignUpRequestDto(String email, String password, String name) {
+    private SignUpRequestDto createSignUpRequestDto(String email, String password, String name, User.UserType userType) {
         SignUpRequestDto dto = new SignUpRequestDto();
-        // ReflectionTestUtils를 사용해 DTO의 private final 필드에 값을 설정
+        // ReflectionTestUtils를 사용해 DTO의 private 필드에 값을 설정
         ReflectionTestUtils.setField(dto, "email", email);
         ReflectionTestUtils.setField(dto, "password", password);
         ReflectionTestUtils.setField(dto, "name", name);
+        ReflectionTestUtils.setField(dto, "userType", userType); // userType 필드 추가
         return dto;
     }
 }

@@ -1,9 +1,7 @@
-package app.sigorotalk.backend.config.auth;
+package app.sigorotalk.backend.domain.auth;
 
 import app.sigorotalk.backend.common.exception.BusinessException;
 import app.sigorotalk.backend.config.jwt.JwtTokenProvider;
-import app.sigorotalk.backend.domain.auth.AuthErrorCode;
-import app.sigorotalk.backend.domain.auth.AuthService;
 import app.sigorotalk.backend.domain.auth.dto.LoginResponseDto;
 import app.sigorotalk.backend.domain.auth.dto.TokenRefreshResponseDto;
 import app.sigorotalk.backend.domain.user.User;
@@ -115,7 +113,7 @@ class AuthServiceTest {
                 .email(email)
                 .password("some-password")
                 .name("Test User")
-                .role(User.Role.ROLE_USER)
+                .userType(User.UserType.BUYER)
                 .build();
 
         Authentication authentication = createTestAuthentication("1"); // 헬퍼 메서드 사용
