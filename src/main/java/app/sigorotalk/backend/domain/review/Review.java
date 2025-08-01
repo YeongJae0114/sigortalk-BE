@@ -1,43 +1,40 @@
 package app.sigorotalk.backend.domain.review;
-
 import app.sigorotalk.backend.common.entity.BaseTimeEntity;
-import app.sigorotalk.backend.domain.order.Order;
-import app.sigorotalk.backend.domain.project.Project;
+import app.sigorotalk.backend.domain.product.Product;
 import app.sigorotalk.backend.domain.user.User;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 
 @Entity
-@Table(name = "tb_review")
+@Table(name = "reviews", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "product_id"})})
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-@AllArgsConstructor
+@Setter
+@NoArgsConstructor
 public class Review extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "review_id")
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 기존 CoffeeChatApplication 관계를 Order로 변경 (하나의 주문에 하나의 리뷰)
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false, unique = true)
-    private Order order;
-
-    // 리뷰가 어떤 프로젝트에 대한 것인지 참조
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
-
-    // 리뷰를 작성한 사용자 참조
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false)
-    private Integer rating;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
-    @Lob
+    private int rating; // 1~5 점수
+
     private String comment;
 }
