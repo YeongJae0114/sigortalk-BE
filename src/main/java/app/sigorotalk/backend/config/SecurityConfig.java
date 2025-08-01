@@ -22,7 +22,8 @@ public class SecurityConfig {
     public static final String[] SWAGGER_URLS = {
             "/v3/api-docs/**",
             "/swagger-ui/**",
-            "/swagger-ui.html"
+            "/swagger-ui.html",
+            "/docs/**"
     };
 
     private final JwtTokenProvider jwtTokenProvider;
