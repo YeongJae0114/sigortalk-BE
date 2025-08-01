@@ -25,7 +25,7 @@ public class CustomUserDetailService implements UserDetailsService {
     }
 
     private UserDetails createUserDetails(User user) {
-        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole().toString());
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getUserType().name());
 
         return new org.springframework.security.core.userdetails.User(
                 String.valueOf(user.getId()), // principal은 userId로 설정
