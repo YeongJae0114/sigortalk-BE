@@ -49,6 +49,7 @@ springdoc:
   swagger-ui:
     enabled: true                # Swagger UI 활성화
     path: /docs                 # Swagger UI 접속 경로
+    url: /v3/api-docs          # 기본 요청 url 
     deep-linking: true         # URL 복사 시 특정 API로 직접 이동 가능
     default-models-expand-depth: 1
     default-model-expand-depth: 1
