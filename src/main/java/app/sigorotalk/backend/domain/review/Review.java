@@ -43,7 +43,6 @@ public class Review extends BaseTimeEntity {
 
     private String comment;
 
-    @Type(JsonType.class)
-    @Column(name = "image_urls", columnDefinition = "json")
-    private List<String> imageUrls = new ArrayList<>();
+    @Column(name = "image_url")
+    private String imageUrl;
 }
