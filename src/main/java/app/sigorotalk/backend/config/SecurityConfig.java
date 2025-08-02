@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.Customizer;
 
 @Configuration
 @EnableWebSecurity
@@ -36,7 +37,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // 기본 설정
-                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())  
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 // 세션 STATELESS 설정
@@ -66,28 +67,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // CORS 설정 정의
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        // 허용할 origin 목록 (배포 주소, 로컬 테스트 주소 등)
-        config.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "https://coffeebara-front.web.app/",
-                "https://coffeebara-front.web.app"
-        ));
-        // 허용할 HTTP 메서드
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // 허용할 헤더
-        config.setAllowedHeaders(Arrays.asList("*"));
-        // 인증 정보(쿠키, Authorization 헤더) 허용 여부
-        config.setAllowCredentials(true);
-        // pre-flight request 캐싱 기간 (초)
-        config.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // 모든 경로에 대해 위 CORS 설정 적용
-        source.registerCorsConfiguration("/**", config);
-        return source;
-    }
 }
