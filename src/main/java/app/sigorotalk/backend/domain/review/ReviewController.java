@@ -25,4 +25,10 @@ public class ReviewController {
         List<ReviewResponseDto> reviews = reviewService.getReviewsForProject(projectId);
         return ResponseEntity.ok(ApiResponse.success(reviews));
     }
+
+    @GetMapping("/reviews/latest")
+    public ResponseEntity<ApiResponse<List<ReviewResponseDto>>> getLatestReviews() {
+        List<ReviewResponseDto> latestReviews = reviewService.getLatest10Reviews();
+        return ResponseEntity.ok(ApiResponse.success(latestReviews));
+    }
 }

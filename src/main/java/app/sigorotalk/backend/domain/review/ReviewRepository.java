@@ -19,4 +19,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "WHERE p.farmProject.id = :projectId")
     List<Review> findAllByProjectIdWithDetails(@Param("projectId") Long projectId);
 
+
+    List<Review> findTop10ByOrderByCreatedAtDesc();
+
 }
