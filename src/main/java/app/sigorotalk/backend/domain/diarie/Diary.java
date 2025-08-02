@@ -38,12 +38,10 @@ public class Diary extends BaseTimeEntity {
 
     private String status;
 
-    @Type(JsonType.class)
-    @Column(name = "image_urls", columnDefinition = "json")
-    private List<String> imageUrls;
+    @Column(name = "image_url")
+    private String imageUrl;
 
-    @Type(JsonType.class)
-    @Column(name = "tags", columnDefinition = "json")
-    private List<String> tags = new ArrayList<>();
+    @Column(name = "tag")
+    private String tag;  // 예: "채소,제철,소농"
 
 }

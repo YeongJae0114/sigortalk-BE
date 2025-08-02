@@ -47,13 +47,11 @@ public class Farmer extends BaseTimeEntity {
 
     private String operationExperience;
 
-    @Type(JsonType.class)
-    @Column(columnDefinition = "json")
-    private List<String> deliverySystem;
+    @Column(name = "delivery_system")
+    private String deliverySystem;
 
-    @Type(JsonType.class)
-    @Column(columnDefinition = "json")
-    private List<String> cultivationMethod;
+    @Column(name = "cultivation_method")
+    private String cultivationMethod;
 
     @OneToMany(mappedBy = "farmer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FarmProject> farmProjects = new ArrayList<>();
