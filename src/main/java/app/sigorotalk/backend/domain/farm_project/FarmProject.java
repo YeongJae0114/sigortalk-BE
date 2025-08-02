@@ -2,7 +2,9 @@ package app.sigorotalk.backend.domain.farm_project;
 import app.sigorotalk.backend.common.entity.BaseTimeEntity;
 import app.sigorotalk.backend.domain.farmer.Farmer;
 import app.sigorotalk.backend.domain.product.Product;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,6 +18,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "farm_projects")
@@ -31,8 +34,6 @@ public class FarmProject extends BaseTimeEntity {
     private Farmer farmer;
 
     private String name;
-
-    private String description;
 
     @OneToMany(mappedBy = "farmProject", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
