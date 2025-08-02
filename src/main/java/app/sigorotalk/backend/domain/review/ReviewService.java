@@ -24,4 +24,11 @@ public class ReviewService {
                 .map(ReviewResponseDto::from)
                 .collect(Collectors.toList());
     }
+
+    public List<ReviewResponseDto> getLatest10Reviews() {
+        return reviewRepository.findTop10ByOrderByCreatedAtDesc()
+                .stream()
+                .map(ReviewResponseDto::from)
+                .collect(Collectors.toList());
+    }
 }
