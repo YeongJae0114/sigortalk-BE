@@ -1,5 +1,6 @@
 package app.sigorotalk.backend.domain.product;
 import app.sigorotalk.backend.common.entity.BaseTimeEntity;
+import app.sigorotalk.backend.common.exception.BusinessException;
 import app.sigorotalk.backend.domain.diarie.Diary;
 import app.sigorotalk.backend.domain.farm_project.FarmProject;
 import app.sigorotalk.backend.domain.order_item.OrderItem;
@@ -54,4 +55,12 @@ public class Product extends BaseTimeEntity{
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    public void decreaseStock(int quantity) {
+        int restStock = this.stock - quantity;
+        if (restStock < 0) {
+            throw new BusinessException(ProductErrorCode.NOT_ENOUGH_STOCK); // 재고 부족 예외 (별도 정의 필요)
+        }
+        this.stock = restStock;
+    }
 }
