@@ -16,7 +16,7 @@ public class ReviewResponseDto {
     private final String authorName; // 작성자 이름
     private final float rating;
     private final String comment;
-    private final List<String> imageUrls;
+    private final String imageUrls;
     private final LocalDateTime createdAt;
 
     // Review 엔티티를 DTO로 변환하는 정적 메서드
@@ -29,7 +29,7 @@ public class ReviewResponseDto {
                 .authorName(authorName)
                 .rating(review.getRating())
                 .comment(review.getComment())
-                .imageUrls(review.getImageUrls())
+                .imageUrls(review.getImageUrl())
                 .createdAt(review.getCreatedAt())
                 .build();
     }

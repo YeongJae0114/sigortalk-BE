@@ -17,8 +17,8 @@ public class FarmerDetailResponseDto {
     private final String profileImageUrl; // 프로필 이미지 URL
     private final String farmLocation;
     private final String operationExperience;
-    private final List<String> deliverySystem;
-    private final List<String> cultivationMethod;
+    private final String deliverySystem;
+    private final String cultivationMethod;
     private final List<FarmProjectDto> farmProjects; // 농장주가 진행하는 프로젝트 목록
 
     // Farmer 엔티티를 DTO로 변환하는 정적 메서드
