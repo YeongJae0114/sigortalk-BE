@@ -2,6 +2,7 @@ package app.sigorotalk.backend.domain.diarie;
 
 import app.sigorotalk.backend.common.entity.BaseTimeEntity;
 import app.sigorotalk.backend.domain.product.Product;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -17,6 +18,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 
 @Entity
@@ -34,14 +36,12 @@ public class Diary extends BaseTimeEntity {
 
     private String content;
 
-    @ElementCollection
-    @CollectionTable(name = "diary_images", joinColumns = @JoinColumn(name = "diary_id"))
-    @Column(name = "image_url")
-    private List<String> imageUrls = new ArrayList<>();
+    private String status;
 
-    @ElementCollection
-    @CollectionTable(name = "diary_tags", joinColumns = @JoinColumn(name = "diary_id"))
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(name = "tag")
-    private List<String> tags = new ArrayList<>();
+    private String tag;  // 예: "채소,제철,소농"
 
 }

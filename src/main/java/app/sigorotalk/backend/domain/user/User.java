@@ -44,9 +44,8 @@ public class User extends BaseTimeEntity {
     private List<Review> reviews = new ArrayList<>();
 
 
-    @Enumerated(EnumType.STRING) // Enum 타입을 문자열로 저장
     @Column(nullable = false, length = 20)
-    private UserType userType; // Role -> UserType 으로 변경
+    private String userType;
 
     // refreshToken 필드는 인증에 필요하므로 그대로 둡니다.
     @Column(length = 500)
@@ -56,7 +55,4 @@ public class User extends BaseTimeEntity {
         this.refreshToken = refreshToken;
     }
 
-    public enum UserType {
-        BUYER, FARMER
-    }
 }

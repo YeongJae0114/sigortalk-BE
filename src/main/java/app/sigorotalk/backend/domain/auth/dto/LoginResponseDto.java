@@ -17,7 +17,7 @@ public class LoginResponseDto {
                 .user(UserInfo.builder()
                         .name(userEntity.getName())
                         .email(userEntity.getEmail())
-                        .role(userEntity.getUserType().name())
+                        .role(userEntity.getUserType())
                         .build())
                 .build();
     }

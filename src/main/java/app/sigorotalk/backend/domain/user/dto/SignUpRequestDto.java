@@ -22,13 +22,17 @@ public class SignUpRequestDto {
     @NotBlank(message = "이름은 필수 입력값입니다.")
     private String name;
 
+    @NotBlank(message = "핸드폰 번호 필수 입력값입니다.")
+    private String phoneNumber;
+
     @NotNull(message = "사용자 유형(BUYER/FARMER)은 필수입니다.")
-    private User.UserType userType; // 사용자가 선택한 유형을 받습니다.
+    private String userType; // 사용자가 선택한 유형을 받습니다.
 
     public User toEntity(PasswordEncoder passwordEncoder) {
         return User.builder()
                 .email(this.email)
                 .password(passwordEncoder.encode(this.password))
+                .phoneNumber(this.phoneNumber)
                 .name(this.name)
                 .userType(this.userType) // 전달받은 userType을 사용합니다.
                 .build();

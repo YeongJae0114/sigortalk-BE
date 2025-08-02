@@ -2,6 +2,8 @@ package app.sigorotalk.backend.domain.review;
 import app.sigorotalk.backend.common.entity.BaseTimeEntity;
 import app.sigorotalk.backend.domain.product.Product;
 import app.sigorotalk.backend.domain.user.User;
+import com.vladmihalcea.hibernate.type.json.JsonType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,9 +12,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 
 @Entity
@@ -34,7 +39,10 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    private int rating; // 1~5 점수
+    private float rating; // 1~5 점수
 
     private String comment;
+
+    @Column(name = "image_url")
+    private String imageUrl;
 }

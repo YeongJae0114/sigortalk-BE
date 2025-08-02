@@ -21,7 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     public static final String[] SWAGGER_URLS = {
             "/v3/api-docs/**",
-            "/swagger-ui/**"
+            "/swagger-ui/**",
+            "/h2-console/**"
     };
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -44,12 +45,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/prometheus").permitAll() // 모니터링 로그 수집 엔드포인트 허용!
                         .requestMatchers(SWAGGER_URLS).permitAll()
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/users", "/login").permitAll() // 로그인, 회원가입은 허용
+                        .requestMatchers("/api/auth/**", "/api/users", "/login", "/api/**").permitAll() // 로그인, 회원가입은 허용
                         .anyRequest().authenticated() // 나머지는 인증 필요
                 )
 
                 // JWT 필터 추가
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
+
 
         return http.build();
     }
