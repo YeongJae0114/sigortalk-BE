@@ -5,6 +5,7 @@ import app.sigorotalk.backend.domain.diarie.Diary;
 import app.sigorotalk.backend.domain.farm_project.FarmProject;
 import app.sigorotalk.backend.domain.order_item.OrderItem;
 import app.sigorotalk.backend.domain.review.Review;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,11 +17,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.List;
+import org.hibernate.annotations.Type;
 
 
 @Entity
@@ -40,12 +43,29 @@ public class Product extends BaseTimeEntity{
 
     private BigDecimal price;
 
+    @Column(nullable = false)
+    private int maxQuantity;
+
     private int stock;
 
     private String description;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "funding_deadline")
+    private LocalDate fundingDeadline;
+
+    @Column(name = "nutrition_info", columnDefinition = "TEXT")
+    private String nutritionInfo;
+
+    @Type(JsonType.class)
+    @Column(name = "image_urls", columnDefinition = "json")
+    private List<String> imageUrls = new ArrayList<>();
+
+    @Column(name = "delivery_fee")
+    private BigDecimal deliveryFee;
+
+    @Type(JsonType.class)
+    @Column(columnDefinition = "json") // PostgreSQL은 "jsonb", MySQL 8+는 "json"
+    private List<GrowingScheduleDto> growingSchedules;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Diary> diaries = new ArrayList<>();
