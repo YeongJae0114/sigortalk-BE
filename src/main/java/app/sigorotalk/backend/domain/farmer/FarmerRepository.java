@@ -3,6 +3,7 @@ package app.sigorotalk.backend.domain.farmer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import java.util.Optional;
 
 public interface FarmerRepository extends JpaRepository<Farmer, Long> {
@@ -19,4 +20,5 @@ public interface FarmerRepository extends JpaRepository<Farmer, Long> {
             "LEFT JOIN FETCH f.farmProjects " +
             "WHERE f.id = :farmerId")
     Optional<Farmer> findByIdWithDetails(@Param("farmerId") Long farmerId);
+
 }
