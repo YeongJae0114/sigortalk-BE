@@ -41,7 +41,9 @@ public class OrderService {
         Order order = Order.createOrder(user, product);
 
         // 3. 결제 정보 생성 (결제 시뮬레이션)
-        Payment payment = Payment.createPayment(order.getTotalPrice(), "SIMULATED_PAYMENT");
+        Payment payment = new Payment();
+        payment.setFinalAmount(order.getTotalPrice());
+        payment.setMethod("SIMULATED_PAYMENT");
         order.setPayment(payment);
 
         // 4. 주문 저장 (Cascade 설정으로 OrderItem, Payment가 함께 저장됨)
