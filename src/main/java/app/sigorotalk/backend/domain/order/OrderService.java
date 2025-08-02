@@ -10,7 +10,6 @@ import app.sigorotalk.backend.domain.product.ProductRepository;
 import app.sigorotalk.backend.domain.user.User;
 import app.sigorotalk.backend.domain.user.UserErrorCode;
 import app.sigorotalk.backend.domain.user.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
